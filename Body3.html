@@ -1,28 +1,42 @@
 <style>
-    body, table, td, th, div, h1, h2, h3, h4, h5, h6, caption, strong {
+    /* เพิ่มฟอนต์ TH Sarabun และกำหนดสไตล์ */
+    body, table, td, th, div, caption {
         font-family: 'TH Sarabun', sans-serif;
+    }
+    
+    /* กำหนดขนาดตัวอักษรสำหรับแต่ละส่วน */
+    caption {
+        font-size: 18pt;
+        font-weight: bold;
+    }
+    
+    thead th {
+        font-size: 16pt;
+        font-weight: bold;
+    }
+    
+    tbody td {
         font-size: 14pt;
     }
+    
+    /* สไตล์ตารางเดิมทั้งหมด */
     table.table-bordered {
         border-collapse: collapse;
         width: 100%;
-        margin-top: 10px;
     }
-    table.table-bordered th, table.table-bordered td {
+    
+    table.table-bordered th, 
+    table.table-bordered td {
         border: 1px solid #000;
         padding: 5px;
     }
-    td[style*="text-align:right"], th[style*="text-align:right"] {
+    
+    td[style*="text-align:right"] {
         text-align: right;
     }
-    thead.table_header {
+    
+    thead { 
         display: table-header-group;
-        background-color: #f5f5f5;
-    }
-    caption {
-        font-weight: bold;
-        margin-bottom: 5px;
-        text-align: left;
     }
 </style>
 
@@ -30,39 +44,39 @@
 {# -------- only pay OR receive -------- #}
 {% if doc.payment_type != 'Internal Transfer' %} 
 <table class="table table-bordered table-condensed">
-    <caption><strong>แต่ละรายการจาก Payment Entry Reference</strong></caption>
+    <caption><strong>each line from Payment Entry Reference</strong></caption>
     <thead class="repeat table_header">
     <tr>
-        <th>ลำดับ</th>
-        <th>เลขที่เอกสาร</th>
-        <th>เอกสารอ้างอิง</th>
-        <th>วันครบกำหนด</th>
-        <th>สกุลเงิน</th>
-        <th>ยอดค้างชำระ</th>
-        <th>ยอดจัดสรร</th>
+        <th>No</th>
+        <th>Document No.</th>
+        <th>Ref Doc No.</th>
+        <th>Due Date</th>
+        <th>Currency</th>
+        <th>Outstanding amt</th>
+        <th>Allocated amt</th>
     </tr>
     </thead>
     {% set outsumm = [0] %}
     {% set asumm = [0] %}
-    {% for item in doc.references | sort(attribute='reference_name') %}
+    {% for item in doc.references | sort (attribute='reference_name') %}
     <tr>
         <td>{{ loop.index }}</td>
         <td>{{ item.reference_name }}</td>
         <td>{{ item.bill_no }}</td>
-        <td>{{ frappe.utils.format_date(item.due_date, "dd/mm/yyyy") }}</td>
+        <td>{{ frappe.utils.format_date(item.due_date) }}</td>
         <td>{{ doc.paid_to_account_currency }} ({{ item.conversion_rate }})</td>
-        <td style="text-align:right">{{ frappe.utils.fmt_money(item.outstanding_amount, format='Thai') }}</td>
-        <td style="text-align:right">{{ frappe.utils.fmt_money(item.allocated_amount, format='Thai') }}</td>
+        <td style="text-align:right">{{ frappe.utils.fmt_money(item.outstanding_amount) }}</td>
+        <td style="text-align:right">{{ frappe.utils.fmt_money(item.allocated_amount) }}</td>
     </tr>
-    {% if asumm.append(asumm[-1] + item.allocated_amount) %}{% endif %}
-    {% if outsumm.append(outsumm[-1] + item.outstanding_amount) %}{% endif %}
+    {% if asumm.append(asumm[-1]  + item.allocated_amount) %}{% endif %}
+    {% if outsumm.append(outsumm[-1]  + item.outstanding_amount) %}{% endif %}
     {% endfor %}
     <tr>
         <td></td>
-        <td style="text-align:right"><strong>รวม</strong></td>
+        <td style="text-align:right"><strong>Total</strong></td>
         <td></td> <td></td> <td></td>
-        <td style="text-align:right"><strong>{{ frappe.utils.fmt_money(outsumm[-1], format='Thai') }}</strong></td>
-        <td style="text-align:right"><strong>{{ frappe.utils.fmt_money(asumm[-1], format='Thai') }}</strong></td>
+        <td style="text-align:right"><strong>{{ frappe.utils.fmt_money(outsumm[-1]) }}</strong></td>
+        <td style="text-align:right"><strong>{{ frappe.utils.fmt_money(asumm[-1]) }}</strong></td>
     </tr>
 </table>
 {% endif %}
