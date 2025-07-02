@@ -1,0 +1,124 @@
+<style>
+    body, table, td, th, div, h1, h2, h3, h4, h5, h6, caption, strong {
+        font-family: 'TH Sarabun', sans-serif;
+    }
+    table.table-bordered {
+        border-collapse: collapse;
+        width: 100%;
+    }
+    table.table-bordered th, table.table-bordered td {
+        border: 1px solid #000;
+        padding: 5px;
+    }
+    td[style*="text-align:right"] {
+        text-align: right;
+    }
+</style>
+
+{# ========================== MACRO ===================== #}
+{% macro itg_unallocated_amount(doc) %}
+<div>
+        {% if doc.unallocated_amount %}
+            {{ itg_print_summary (doc.unallocated_amount*-1,doc.paid_from) }} 
+        {% endif %}
+</div>
+{% endmacro %}
+{% macro itg_deduction(doc) %}
+<div>
+        {% for item in doc.deductions %}
+            {{ itg_print_summary (item.amount, item.account) }} 
+        {% endfor %}
+</div>
+{% endmacro %}
+{% macro itg_taxes(doc) %}
+<div>
+        {% for item in doc.taxes %}
+            {{ itg_print_summary (item.base_tax_amount, item.account_head) }}  
+        {% endfor %}
+</div>
+{% endmacro %}
+
+{% macro itg_print_summary (dd, work_account) %}
+<div>
+        {% if ll.append(ll[-1]  + 1 )  %}{% endif %}
+        {% if dd > 0 %} {% set debit  = dd %}   {% set credit = 0  %}
+        {% else %}      {% set debit  = 0 %}    {% set credit = dd * -1 %}
+        {% endif %}
+            <tr>
+                <td>{{ ll[-1] }}</td>  <td>{{ work_account }}</td>
+                <td style="text-align:right">{{frappe.utils.fmt_money(debit,format='Thai')}}</td>
+                <td style="text-align:right">{{frappe.utils.fmt_money(credit,format='Thai')}}</td>
+            </tr>
+	    {% if adebit.append(adebit[-1]    + debit  )  %}{% endif %}
+            {% if acredit.append(acredit[-1]  + credit )  %}{% endif %}
+</div>
+{% endmacro %}
+
+{% macro itg_print_line (a_line, a_account, a_debit, a_credit) %}
+<div>
+            <tr>
+                <td>{{ a_line }}</td>  <td>{{ a_account }}</td>
+                <td style="text-align:right">{{frappe.utils.fmt_money(a_debit,format='Thai')}}</td>
+                <td style="text-align:right">{{frappe.utils.fmt_money(a_credit,format='Thai')}}</td>
+            </tr>
+</div>
+{% endmacro %}
+
+{# ------------------- Main Program starts here ) -------------------- #}
+{# ------------------- Summary by account : line #1  : dr - derived from paid_to, paid_from ) -------------------- #}
+{# ------------------- Summary by account : line #2 onward arefrom taxes. deduction     -------------------- #}
+{# ------------------- Summary by account : last line: cr - derived from paid_to, paid_from ) -------------------- #}
+    
+<div class="margin-top">
+<table class='table table-bordered table-condensed'>
+    <caption><strong>Summary by account ( derived from paid_to, paid_from ) </strong></caption>
+    {% set adebit = [0] %}  
+    {% set acredit = [0] %}
+    <tr>
+        <th>No</th>
+        <th>Account</th>
+        <th>Debit Amount</th>
+        <th>Credit Amount</th>
+    </tr>
+{% if doc.payment_type == 'Receive' %}  {# ============================================================ #}
+    {{ itg_print_line (1, doc.paid_to, doc.base_received_amount, 0) }} {# call Macro #}
+    {% if adebit.append(adebit[-1]  + doc.base_received_amount)  %}{% endif %}
+    {% set ll = [1] %}   
+    {{ itg_taxes(doc) }}            {# call Macro #}
+    {{ itg_deduction(doc) }}        {# call Macro Deduction #}
+    {{ itg_unallocated_amount(doc) }}        {# call Macro #}
+    {% if ll.append(ll[-1]  + 1 )  %}{% endif %}
+    {{ itg_print_line (ll[-1], doc.paid_from, 0, doc.base_total_allocated_amount) }} {# call Macro #}
+    {% if acredit.append(acredit[-1]  + doc.base_total_allocated_amount )  %}{% endif %}
+{% endif %}
+    
+{% if doc.payment_type == 'Pay' %}             {# ============================================================ #}
+    {{ itg_print_line (1, doc.paid_to, doc.base_total_allocated_amount, 0) }}
+    {% if adebit.append(adebit[-1]  + doc.base_total_allocated_amount)  %}{% endif %}
+    {% set ll = [1] %}   
+    {{ itg_taxes(doc) }}            {# call Macro #}
+    {{ itg_deduction(doc) }}        {# call Macro #}
+    {{ itg_unallocated_amount(doc) }}        {# call Macro #}
+    {% if ll.append(ll[-1]  + 1 )  %}{% endif %}
+    {{ itg_print_line (ll[-1], doc.paid_from, 0, doc.base_paid_amount) }} {# call Macro #}
+    {% if acredit.append(acredit[-1]  + doc.base_paid_amount)  %}{% endif %}
+{% endif %}
+
+{% if doc.payment_type == 'Internal Transfer' %} {# ============================================================ #}
+    {{ itg_print_line (1, doc.paid_to, doc.base_received_amount_after_tax, 0) }} {# call Macro #}
+    {% if adebit.append(adebit[-1]  + doc.base_received_amount_after_tax)  %}{% endif %}
+    {% set ll = [1] %}   
+    {{ itg_taxes(doc) }}            {# call Macro #}
+    {{ itg_deduction(doc) }}        {# call Macro #}
+    {% if ll.append(ll[-1]  + 1 )  %}{% endif %}
+    {{ itg_print_line (ll[-1], doc.paid_from, 0, doc.paid_amount) }} {# call Macro #}
+    {% if acredit.append(acredit[-1]  + doc.paid_amount)  %}{% endif %}
+{% endif %}
+    <tr>
+        <td> </td>
+        <td style="text-align:right"><strong> {{ frappe.utils.total_thai_diff(adebit[-1], acredit[-1]) }} </strong></td>
+        <td style="text-align:right"><strong> {{frappe.utils.fmt_money(adebit[-1])}} </strong></td>
+        <td style="text-align:right"><strong> {{frappe.utils.fmt_money(acredit[-1])}} </strong></td>
+    </tr>
+</table>
+</div>
