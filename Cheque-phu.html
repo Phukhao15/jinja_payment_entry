@@ -1,0 +1,123 @@
+<style>
+    .print-format {
+        padding: 0px;
+        font-family: 'TH Sarabun'! important;
+        font-size: 11pt;
+        line-height: 1.4;
+    }
+    @media screen {
+        .print-format {
+            padding: 0in;
+        }
+    }
+    .abs-span {
+        position: absolute;
+    }
+</style>
+
+{% set xname = '' %}
+{% if doc.payment_type == 'Internal Transfer' %}
+    {% set xname = doc.refer_party_name %}
+{% else %}
+    {% set xname = doc.party_name %}
+{% endif %}
+
+<div style="position: relative; top: 0.0cm">
+    <div style="width: 20.0cm; height: 9.0cm;">
+
+        <!-- แถบ A/C PAYEE ONLY -->
+        <span class="abs-span"
+            style="top: 1.0cm; left: 7.5cm;
+                   border-bottom: 0.5px solid #000;
+                   border-top: 0.5px solid #000;
+                   font-size: 8pt;
+                font-family: 'TH Sarabun'! important;
+                   
+                   width: 2.5cm;
+                   text-align: center;">
+            A/C PAYEE ONLY
+        </span>
+
+        <!-- วันที่ (แบบไทย) -->
+        <span class="abs-span"
+            style="top: 1.0cm; left: 14.0cm;
+             font-family: 'TH Sarabun'! important;
+                   font-size: 10.5pt;">
+            {{ frappe.utils.date_thai_space(doc.reference_date or '') }}
+        </span>
+
+        <!-- วันที่ (แบบสั้น) -->
+        <span class="abs-span"
+            style="top: 2.0cm; left: 3.0cm;
+             font-family: 'TH Sarabun'! important;
+                   font-size: 12pt;">
+
+            {{ frappe.utils.format_date((doc.reference_date or ''), "dd/mm/yy") }}
+        </span>
+
+        <!-- เลขบัญชี -->
+        <span class="abs-span"
+            style="top: 5.0cm; left: 4.0cm;
+             font-family: 'TH Sarabun'! important;
+                   min-width: 6cm;">
+            {{ doc.account_no or '' }}
+        </span>
+
+        <!-- ชื่อผู้รับ 1 -->
+        <span class="abs-span"
+            style="top: 3.0cm; left: 3.0cm;
+              font-family: 'TH Sarabun'! important;
+                   font-size: 8pt;
+                   min-width: 6cm;">
+            {{ xname }}
+        </span>
+
+        <!-- ชื่อผู้รับ 2 -->
+        <span class="abs-span"
+            style="top: 3.0cm; left: 9.0cm;    <!--   ปรับไปทางขวา-->
+              font-family: 'TH Sarabun'! important;
+              font-size: 8pt;
+                   min-width: 6cm;">
+            {{ xname }}
+        </span>
+
+        <!-- ตำแหน่งระบุ “======” -->
+        <span class="abs-span"
+            style="top: 3.0cm; left: 16.0cm;
+              font-family: 'TH Sarabun'! important;
+                   min-width: 6cm;">
+            ======
+        </span>
+
+        <!-- จำนวนเงิน -->
+        <span class="abs-span"
+            style="top: 4.0cm; left: 3.0cm;
+                   font-size: 6pt;
+                   font-family: 'TH Sarabun'! important;
+                   min-width: 4cm;">
+            {{ '**' + (frappe.utils.fmt_money(doc.base_paid_amount) or frappe.utils.fmt_money(doc.base_received_amount)) + '**' }}
+        </span>
+
+        <!-- จำนวนเงิน (ตัวอักษรไทย) -->
+        <span class="abs-span"
+            style="top: 4.0cm; left: 8.0cm;
+                   display: block;
+                   font-family: 'TH Sarabun'! important;
+                   font-size: 8pt;
+                   width: 15.0cm;
+                   line-height: 0.6cm;
+                   word-wrap: break-word;">
+            {{ '===' + frappe.utils.money_in_thai(doc.base_paid_amount or doc.base_received_amount) + '===' }}
+        </span>
+
+        <!-- จำนวนเงิน (ขวา) -->
+        <span class="abs-span"
+            style="top: 4.5cm; left: 12.0cm;
+                   font-size: 12pt;
+                   font-family: 'TH Sarabun'! important;
+                   min-width: 4cm;">
+            {{ '**' + (frappe.utils.fmt_money(doc.base_paid_amount) or frappe.utils.fmt_money(doc.base_received_amount)) + '**' }}
+        </span>
+
+    </div>
+</div>
