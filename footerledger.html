@@ -1,0 +1,129 @@
+{# ---------------------- Footer Section ---------------------- #}
+
+{# -- Define Default Variables จากชื่อเอกสาร -- #}
+{% set h2 = doc.name[:2] %}
+{% set h7 = doc.name[:7] %}
+{% set h6 = doc.name[:6] %}
+
+{# -- กำหนดข้อความเริ่มต้นสำหรับ footer -- #}
+{% set foot_01 = " Issued By " %}
+{% set foot_02 = " Posted By " %}
+{% set foot_03 = "Approved By" %}
+{% set foot_04 = "Received By" %}
+
+{% set xgroup = "Unknown" %}
+{% set cgroup = "4" %}
+
+{# ---------------------- Set Footer Group และจำนวน column ตามประเภทเอกสาร ---------------------- #}
+{% if (( h6 in ("ITG-CN", "ITG-PB")) or (h7 in ("ITG-PBI"))) %}
+    {% set xgroup = "NOT-USE-FOOTER" %}
+{% endif %}
+
+{% if h2 == "JV" %}
+    {% set xgroup = "Footer-C" %}
+{% elif h6 == "ACC-JV" %}
+    {% set xgroup = "Footer-C" %} {% set cgroup = "4" %}
+{% elif h6 == "ITG-PI" %}
+    {% set xgroup = "Footer-B" %} {% set cgroup = "4" %}
+{% elif h6 in ("ITG-PO", "ITG-PR") %}
+    {% set xgroup = "Footer-D" %} {% set cgroup = "1" %}
+{% elif h6 == "ITG-SO" %}
+    {% set xgroup = "Footer-E" %} {% set cgroup = "2" %}
+{% elif h6 == "ITG-CN" %}
+    {% set xgroup = "Footer-B" %} {% set cgroup = "3" %}
+{% else %}
+    {% set xgroup = "Footer-A" %} {% set cgroup = "4" %}
+{% endif %}
+
+{# -- เงื่อนไขเฉพาะ Doctype -- #}
+{% if doc.doctype == "Purchase Receipt" %}
+    {% set xgroup = "NOT-USE-FOOTER" %}
+{% endif %}
+
+{% if doc.doctype == "Credit Note Form Extra" %}
+    {% set xgroup = "Footer-B" %} {% set cgroup = "3" %}
+{% endif %}
+
+{# ---------------------- กำหนดข้อความตามกลุ่ม Footer ---------------------- #}
+{% if xgroup != "NOT-USE-FOOTER" %}
+
+    {% if xgroup == "Footer-B" %}
+        {% set foot_02 = "Verified By " %}
+        {% set foot_04 = "Posted By" %}
+    {% elif xgroup == "Footer-C" %}
+        {% set foot_02 = "Certified By" %}
+        {% set foot_04 = "Posted By" %}
+    {% elif xgroup == "Footer-D" %}
+        {% set foot_01 = "Authorized Signature" %}
+    {% elif xgroup == "Footer-E" %}
+        {% set foot_01 = "พนักงานขาย" %}
+        {% set foot_02 = "ผู้มีอำนาจลงนาม" %}
+    {% endif %}
+
+    {# ---------------------- Layout Table ตามจำนวน column ที่กำหนด ---------------------- #}
+    {% if cgroup == "1" %}
+        <table style="text-align: center;">
+            <tbody><tr><td>{{ foot_01 }}</td></tr>
+            <tr><td>_________________________</td></tr>
+            <tr><td>Date ....../....../......</td></tr>
+        </tbody></table>
+
+    {% elif cgroup == "2" %}
+        <table style="text-align: center;">
+            <tbody><tr>
+                <td>{{ foot_01 }}</td>
+                <td>{{ foot_02 }}</td>
+            </tr>
+            <tr>
+                <td>_________________________</td>
+                <td>_________________________</td>
+            </tr>
+            <tr>
+                <td>Date ....../....../......</td>
+                <td>Date ....../....../......</td>
+            </tr>
+        </tbody></table>
+
+    {% elif cgroup == "3" %}
+        <table style="text-align: center;">
+            <tbody><tr>
+                <td>{{ foot_01 }}</td>
+                <td>{{ foot_02 }}</td>
+                <td>{{ foot_03 }}</td>
+            </tr>
+            <tr>
+                <td>_________________________</td>
+                <td>_________________________</td>
+                <td>_________________________</td>
+            </tr>
+            <tr>
+                <td>Date ....../....../......</td>
+                <td>Date ....../....../......</td>
+                <td>Date ....../....../......</td>
+            </tr>
+        </tbody></table>
+
+    {% else %}
+        <table style="text-align: left;">
+            <tbody><tr>
+                <td style>{{ foot_01 }}</td>
+                <td>{{ foot_02 }}</td>
+                <td>{{ foot_03 }}</td>
+                <td>{{ foot_04 }}</td>
+            </tr>
+            <tr>
+                <td>_________________________</td>
+                <td>_________________________</td>
+                <td>_________________________</td>
+                <td>_________________________</td>
+            </tr>
+            <tr>
+                <td>Date ....../....../......</td>
+                <td>Date ....../....../......</td>
+                <td>Date ....../....../......</td>
+                <td>Date ....../....../......</td>
+            </tr>
+        </tbody></table>
+    {% endif %}
+
+{% endif %} {# ---------------------- END: Footer Section ---------------------- #}

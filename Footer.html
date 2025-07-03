@@ -1,27 +1,52 @@
 <style>
     body, * {
-        font-family: 'TH Sarabun New', Sarabun, sans-serif !important;
+         font-family: 'TH Sarabun' !important;
         font-size: 14px;
     }
     
     table {
-        font-family: 'TH Sarabun New', Sarabun, sans-serif !important;
+        font-family: 'TH Sarabun' !important;
         font-size: 13px;
     }
     
     table td, table th {
-        font-family: 'TH Sarabun New', Sarabun, sans-serif !important;
+        font-family: 'TH Sarabun' !important;
     }
     
     caption {
-        font-family: 'TH Sarabun New', Sarabun, sans-serif !important;
+         font-family: 'TH Sarabun' !important;
         font-size: 14px;
         font-weight: 600;
     }
     
     strong {
-        font-family: 'TH Sarabun New', Sarabun, sans-serif !important;
+         font-family: 'TH Sarabun' !important;
         font-weight: 600;
+    }
+    
+    /* เพิ่มสไตล์เพื่อให้ตารางดูสวยงามขึ้น */
+    table.table-bordered {
+        border-collapse: collapse;
+        width: 100%;
+    }
+    
+    table.table-bordered th, 
+    table.table-bordered td {
+        border: 1px solid #000;
+        padding: 8px;
+        vertical-align: middle;
+    }
+    
+    /* สไตล์สำหรับ header */
+    table.table-bordered th {
+        background-color: #f8f9fa;
+        font-weight: 600;
+    }
+    
+    /* รักษาการแสดงผลของตัวเลข */
+    .number-cell {
+        text-align: right;
+        font-feature-settings: 'tnum';
     }
 </style>
 
@@ -31,7 +56,7 @@
     <caption><strong>Summary from Payment Entry Reference</strong></caption>
     <tr>
         <th></th>
-        <th style="text-align:center"> Outstanding_amount</th>
+        <th style="text-align:center">Outstanding_amount</th>
         <th style="text-align:center">Allocated_amount</th>
     </tr>
     {% set outsumm = [0] %}
@@ -42,8 +67,8 @@
     {% endfor %}
     <tr>
         <td style="text-align:right"><strong>Total</strong></td>
-        <td style="text-align:right"><strong>{{ frappe.utils.fmt_money(outsumm[-1]) }}</strong></td>
-        <td style="text-align:right"><strong>{{ frappe.utils.fmt_money(asumm[-1]) }}</strong></td>
+        <td style="text-align:right" class="number-cell"><strong>{{ frappe.utils.fmt_money(outsumm[-1]) }}</strong></td>
+        <td style="text-align:right" class="number-cell"><strong>{{ frappe.utils.fmt_money(asumm[-1]) }}</strong></td>
     </tr>
 </table>
 {% endif %}

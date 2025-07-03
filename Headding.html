@@ -1,56 +1,44 @@
 <style>
-    /* Reset และสไตล์พื้นฐาน */
-    body, body *:not(style):not(script) {
-        font-family: "TH Sarabun New", "TH Sarabun", sans-serif !important;
-        font-size: 14pt !important;
-        line-height: 1.5;
+    /* เพิ่มฟอนต์ TH Sarabun */
+    @font-face {
+        font-family: 'TH Sarabun';
+        src: url('/assets/erpnext/fonts/THSarabun.ttf') format('truetype');
+        font-weight: normal;
+        font-style: normal;
     }
     
-    /* หัวเรื่องเอกสาร */
+    /* กำหนดให้ใช้ TH Sarabun แต่รักษาภาษาเดิม */
+    body, body * {
+        font-family: 'TH Sarabun' !important;
+    }
+    
+    /* กำหนดขนาดตัวอักษรสำหรับส่วนต่างๆ */
     .print-heading h2 {
-        font-size: 16pt !important;
-        text-align: right;
-        margin-bottom: 5px;
+        font-size: 14pt !important;
+        margin: 0;
+        padding: 0;
     }
     
-    .sub-heading {
-        font-size: 13pt !important;
-        text-align: right;
+    .print-heading .sub-heading {
+        font-size: 12pt !important;
         display: block;
-        margin-bottom: 15px;
+        margin-top: 5px;
     }
     
-    /* ตารางและข้อมูล */
-    .data-table {
-        width: 100%;
-        border-collapse: collapse;
+    .margin-bottom table,
+    .margin-bottom table td,
+    .margin-bottom table th,
+    .margin-bottom table tr {
+        font-size: 12pt !important;
     }
     
-    .data-table td {
-        padding: 3px 5px;
-        vertical-align: top;
+    /* ปรับขนาดฟอนต์สำหรับข้อมูลข้างๆ ตาราง */
+    .col-xs-6 strong {
+        font-size: 12pt !important;
     }
     
-    .data-label {
-        font-weight: bold;
-        white-space: nowrap;
-    }
-    
-    .data-value {
-        word-break: break-word;
-    }
-    
-    /* สถานะเอกสาร */
-    .draft-watermark {
-        color: red;
-        font-weight: bold;
-        text-align: center;
-        margin-bottom: 10px;
-    }
-    
-    /* ระยะห่าง */
-    .margin-bottom {
-        margin-bottom: 15px;
+    .col-xs-6 {
+        font-size: 12pt !important;
     }
 </style>
 
@@ -65,15 +53,14 @@
 {% else %}  {% if doc.name[:2] == 'PV' %} {% set xhead  = 'สมุดรายวันจ่ายชำระ'%} {% set xsubhead  = 'Payment Journal' %}
 {% else %}                                {% set xhead     = 'Payment Entry' %} {% set xsubhead  = doc.name %}
 {% endif %} {% endif %} {% endif %} {% endif %} {% endif %} {% endif %} {% endif %} {% endif %}
-
 <div class="print-heading">				
-    <h2>{{ xhead }}</h2>
-    <small class="sub-heading">{{ xsubhead }}</small>				
-</div>
+<h2>{{ xhead }}<br/>
+<small class="sub-heading">{{ xsubhead }}</small>				
+</h2></div>
 
 {%- if doc.docstatus == 0 -%}
-<div class="draft-watermark">
-    <h4> == DRAFT == </h4>
+<div class="text-center" document-status="draft">
+    <h4 style="margin: 0px; font-size: 16pt !important;"> == DRAFT == </h4>
 </div>
 {%- endif -%}
 
@@ -86,53 +73,31 @@
     {% endif %}
 {% endif %}
 
+{% set xstate   = 'UNKNOWN' %}
+{% if doc.docstatus == 0 %}  {% set xstate   = 'DRAFT' %}       {% endif %}
+{% if doc.docstatus == 1 %}  {% set xstate   = 'SUBMITTED' %}   {% endif %}
+
 <div class="row margin-bottom">
-    <!-- คอลัมน์ซ้าย -->
-    <div class="col-xs-6">
-        <table class="data-table">
-            {% if doc.name[:6] == 'ITG-PI' %}
-                <tr>
-                    <td class="data-label">Pay-In:</td>
-                    <td class="data-value">{{ doc.paid_from_account_type }}</td>
-                </tr>
-            {% else %}
-                <tr>
-                    <td class="data-label"> Party:</td>
-                    <td class="data-value">{{ xparty }}</td>
-                </tr>
-                {% if doc.name[:2] != 'RO' and doc.payment_type != 'Internal Transfer' %}
-                    <tr>
-                        <td class="data-label">Address:</td>
-                        <td class="data-value">{{ doc.refer_full_address or '' }}</td>
-                    </tr>
-                    <tr>
-                        <td class="data-label">TAX ID:</td>
-                        <td class="data-value">{{ doc.refer_tax_number or '' }}</td>
-                    </tr>
-                {% endif %}
-            {% endif %}
-        </table>
-    </div>
-    
-    <!-- คอลัมน์ขวา -->
-    <div class="col-xs-6">
-        <table class="data-table">
-            <tr>
-                <td class="data-label">Document No:</td>
-                <td class="data-value">{{ doc.name }}</td>
-            </tr>
-            <tr>
-                <td class="data-label">Date:</td>
-                <td class="data-value">{{ frappe.utils.format_date(doc.posting_date, "dd-mm-yyyy") }}</td>
-            </tr>
-            <tr>
-                <td class="data-label">Currency:</td>
-                <td class="data-value">{{ doc.paid_to_account_currency }} (อัตราแลกเปลี่ยน: {{ doc.target_exchange_rate }})</td>
-            </tr>
-            <tr>
-                <td class="data-label">NAV ref No::</td>
-                <td class="data-value">{{ doc.nav_reference_no or '' }}</td>
-            </tr>
-        </table>
-    </div>
+{# ------------------- Header 1, col 1 -------------------- #}
+<div class="col-xs-6">
+    <table style="width: 100%;">
+    {% if doc.name[:6] == 'ITG-PI' %} {% set xname  = 'Pay-In'%} {% set xsubrate  = 'Pay-In1' %}
+	<tr><td><strong>{{ xname }}:</strong></td><td>{{doc.paid_from_account_type }}</td></tr>
+	{% else %} {% if doc.name[:6] != 'ITG-PI' %}
+        <tr><td><strong>Party: </strong></td><td>{{ xparty }}</td></tr>
+    {% if doc.name[:2] != 'RO' %} {% if doc.payment_type != 'Internal Transfer' %}
+        <tr><td><strong>Address: </strong></td><td>{{ doc.refer_full_address }}</td></tr>
+        <tr><td><strong>TAX Id: </strong></td><td>{{ doc.refer_tax_number }}</td></tr>
+    {% endif %} {% endif %} {% endif %} {% endif %}
+    </table>
+</div>
+{# ------------------- Header 1, col 2 -------------------- #}
+<div class="col-xs-6">
+    <table style="width: 100%;">
+        <tr><td><strong>Document No: </strong></td><td>{{ doc.name }}</td></tr>
+        <tr><td><strong>Date: </strong></td><td>{{ frappe.utils.format_date(doc.posting_date) }}</td></tr>
+        <tr><td><strong>Currency: </strong></td><td>{{ doc.paid_to_account_currency }} ({{ doc.target_exchange_rate }}) </td></tr>
+        <tr><td><strong>NAV ref No: </strong></td><td>{{ doc.nav_reference_no }}</td></tr>
+    </table>
+</div>
 </div>

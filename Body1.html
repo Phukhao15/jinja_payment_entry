@@ -1,134 +1,200 @@
-<style>
-    body, * {
-        font-family: 'TH Sarabun New', Sarabun, sans-serif !important;
-        font-size: 14px;
-    }
-    
-    table {
-        font-family: 'TH Sarabun New', Sarabun, sans-serif !important;
-        font-size: 13px;
-    }
-    
-    table td, table th {
-        font-family: 'TH Sarabun New', Sarabun, sans-serif !important;
-    }
-    
-    caption {
-        font-family: 'TH Sarabun New', Sarabun, sans-serif !important;
-        font-size: 14px;
-        font-weight: 600;
-    }
-    
-    strong {
-        font-family: 'TH Sarabun New', Sarabun, sans-serif !important;
-        font-weight: 600;
-    }
-</style>
+        <style>
+            /* Base Font Setting - ฟอนต์หลักสำหรับทั้งหมด */
+            body, * {
+                font-family: 'TH Sarabun' !important;
+                font-size: 14pt;
+            }
+            
+            /* Table Header Class - สำหรับหัวตาราง (No, Account, Debit Amount, Credit Amount) */
+            .table-header {
+                text-align: left !important;
+                font-family: 'TH Sarabun' !important;
+                font-size: 12pt !important;
+                font-weight: 600 !important;
+                background-color: #f8f9fa;
+            
+            }
+            
+            /* Table Data Class - สำหรับข้อมูลในตาราง */
+            .table-data {
+                 font-family: 'TH Sarabun' !important;
+                font-size: 11pt !important;
+                vertical-align: middle;
+            }
+            
+            /* Table Number Class - สำหรับคอลัมน์ No */
+            .table-number {
+                font-family: 'TH Sarabun' !important;
+                font-size: 10pt !important;
+                text-align: left;
+                width: 50px;
+            }
+            
+            /* Table Account Class - สำหรับคอลัมน์ Account */
+            .table-account {
+               font-family: 'TH Sarabun' !important;
+                font-size: 11pt !important;
+                text-align: left;
+                padding-left: 10px;
+                width: 650px; /* กำหนดความกว้างของคอลัมน์ Account */
+            }
+            
+            /* Table Amount Class - สำหรับคอลัมน์ Debit และ Credit Amount */
+            .table-amount {
+                 font-family: 'TH Sarabun' !important;
+                font-size: 11pt !important;
+                text-align: right;
+                padding-right: 10px;
+                width: 150px; /* กำหนดความกว้างของคอลัมน์ Amount */
+            }
+            
+            /* Table Total Class - สำหรับแถวรวม */
+            .table-total {
+                font-family: 'TH Sarabun' !important;
+                font-size: 12pt !important;
+                font-weight: 600 !important;
+                
+            }
+            
+            /* Caption Class - สำหรับหัวเรื่องตาราง */
+        .table-caption {
+          font-family: 'TH Sarabun' !important;
+         font-size: 12pt !important;
+         text-align:  left !important;
+         margin-bottom: 1px;
+        }
+      
+         .table-caption strong {
+          font-size: 10pt !important;
+        }
+            
+            /* Table Base Style */
+            table {
+                 font-family: 'TH Sarabun' !important;
+                width: 100%;
+                /* border-collapse: collapse; */
+                margin-bottom: 20px;
+            }
+            
+            /* Table Border
+            table, th, td {
+                border: 1px solid #000;
+            } */
+            
+            /* Padding for cells */
+            th, td {
+                padding: 8px;
+            }
+        </style>
 
-{# ========================== MACRO ===================== #}
-{% macro itg_unallocated_amount(doc) %}
-<div>
-        {% if doc.unallocated_amount %}
-            {{ itg_print_summary (doc.unallocated_amount*-1,doc.paid_from) }} 
-        {% endif %}
-</div>
-{% endmacro %}
-{% macro itg_deduction(doc) %}
-<div>
-        {% for item in doc.deductions %}
-            {{ itg_print_summary (item.amount, item.account) }} 
-        {% endfor %}
-</div>
-{% endmacro %}
-{% macro itg_taxes(doc) %}
-<div>
-        {% for item in doc.taxes %}
-            {{ itg_print_summary (item.base_tax_amount, item.account_head) }}  
-        {% endfor %}
-</div>
-{% endmacro %}
+        {# ========================== MACRO ===================== #}
+        {% macro itg_unallocated_amount(doc) %}
+        <div>
+                {% if doc.unallocated_amount %}
+                    {{ itg_print_summary (doc.unallocated_amount*-1,doc.paid_from) }} 
+                {% endif %}
+        </div>
+        {% endmacro %}
 
-{% macro itg_print_summary (dd, work_account) %}
-<div>
-        {% if ll.append(ll[-1]  + 1 )  %}{% endif %}
-        {% if dd > 0 %} {% set debit  = dd %}   {% set credit = 0  %}
-        {% else %}      {% set debit  = 0 %}    {% set credit = dd * -1 %}
-        {% endif %}
+        {% macro itg_deduction(doc) %}
+        <div>
+                {% for item in doc.deductions %}
+                    {{ itg_print_summary (item.amount, item.account) }} 
+                {% endfor %}
+        </div>
+        {% endmacro %}
+
+        {% macro itg_taxes(doc) %}
+        <div>
+                {% for item in doc.taxes %}
+                    {{ itg_print_summary (item.base_tax_amount, item.account_head) }}  
+                {% endfor %}
+        </div>
+        {% endmacro %}
+
+        {% macro itg_print_summary (dd, work_account) %}
+        <div>
+                {% if ll.append(ll[-1]  + 1 )  %}{% endif %}
+                {% if dd > 0 %} {% set debit  = dd %}   {% set credit = 0  %}
+                {% else %}      {% set debit  = 0 %}    {% set credit = dd * -1 %}
+                {% endif %}
+                    <tr>
+                        <td class="table-data table-number">{{ ll[-1] }}</td>
+                        <td class="table-data table-account">{{ work_account }}</td>
+                        <td class="table-data table-amount">{{frappe.utils.fmt_money(debit,format='Thai')}}</td>
+                        <td class="table-data table-amount">{{frappe.utils.fmt_money(credit,format='Thai')}}</td>
+                    </tr>
+                {% if adebit.append(adebit[-1]    + debit  )  %}{% endif %}
+                    {% if acredit.append(acredit[-1]  + credit )  %}{% endif %}
+        </div>
+        {% endmacro %}
+
+        {% macro itg_print_line (a_line, a_account, a_debit, a_credit) %}
+        <div>
+                    <tr>
+                        <td class="table-data table-number">{{ a_line }}</td>
+                        <td class="table-data table-account">{{ a_account }}</td>
+                        <td class="table-data table-amount">{{frappe.utils.fmt_money(a_debit,format='Thai')}}</td>
+                        <td class="table-data table-amount">{{frappe.utils.fmt_money(a_credit,format='Thai')}}</td>
+                    </tr>
+        </div>
+        {% endmacro %}
+
+        {# ------------------- Main Program starts here ) -------------------- #}
+        {# ------------------- Summary by account : line #1  : dr - derived from paid_to, paid_from ) -------------------- #}
+        {# ------------------- Summary by account : line #2 onward arefrom taxes. deduction     -------------------- #}
+        {# ------------------- Summary by account : last line: cr - derived from paid_to, paid_from ) -------------------- #}
+            
+        <div class="margin-top">
+        <table class='table table-bordered table-condensed'>
+            <caption class="table-caption"><strong>Summary by account ( derived from paid_to, paid_from ) </strong></caption>
+            {% set adebit = [0] %}  
+            {% set acredit = [0] %}
             <tr>
-                <td>{{ ll[-1] }}</td>  <td>{{ work_account }}</td>
-                <td style="text-align:right">{{frappe.utils.fmt_money(debit,format='Thai')}}</td>
-                <td style="text-align:right">{{frappe.utils.fmt_money(credit,format='Thai')}}</td>
+                <th class="table-header">No</th>
+                <th class="table-header">Account</th>
+                <th class="table-header">Debit Amount</th>
+                <th class="table-header">Credit Amount</th>
             </tr>
-	    {% if adebit.append(adebit[-1]    + debit  )  %}{% endif %}
-            {% if acredit.append(acredit[-1]  + credit )  %}{% endif %}
-</div>
-{% endmacro %}
+        {% if doc.payment_type == 'Receive' %}  {# ============================================================ #}
+            {{ itg_print_line (1, doc.paid_to, doc.base_received_amount, 0) }} {# call Macro #}
+            {% if adebit.append(adebit[-1]  + doc.base_received_amount)  %}{% endif %}
+            {% set ll = [1] %}   
+            {{ itg_taxes(doc) }}            {# call Macro #}
+            {{ itg_deduction(doc) }}        {# call Macro Deduction #}
+            {{ itg_unallocated_amount(doc) }}        {# call Macro #}
+            {% if ll.append(ll[-1]  + 1 )  %}{% endif %}
+            {{ itg_print_line (ll[-1], doc.paid_from, 0, doc.base_total_allocated_amount) }} {# call Macro #}
+            {% if acredit.append(acredit[-1]  + doc.base_total_allocated_amount )  %}{% endif %}
+        {% endif %}
+            
+        {% if doc.payment_type == 'Pay' %}             {# ============================================================ #}
+            {{ itg_print_line (1, doc.paid_to, doc.base_total_allocated_amount, 0) }}
+            {% if adebit.append(adebit[-1]  + doc.base_total_allocated_amount)  %}{% endif %}
+            {% set ll = [1] %}   
+            {{ itg_taxes(doc) }}            {# call Macro #}
+            {{ itg_deduction(doc) }}        {# call Macro #}
+            {{ itg_unallocated_amount(doc) }}        {# call Macro #}
+            {% if ll.append(ll[-1]  + 1 )  %}{% endif %}
+            {{ itg_print_line (ll[-1], doc.paid_from, 0, doc.base_paid_amount) }} {# call Macro #}
+            {% if acredit.append(acredit[-1]  + doc.base_paid_amount)  %}{% endif %}
+        {% endif %}
 
-{% macro itg_print_line (a_line, a_account, a_debit, a_credit) %}
-<div>
-            <tr>
-                <td>{{ a_line }}</td>  <td>{{ a_account }}</td>
-                <td style="text-align:right">{{frappe.utils.fmt_money(a_debit,format='Thai')}}</td>
-                <td style="text-align:right">{{frappe.utils.fmt_money(a_credit,format='Thai')}}</td>
+        {% if doc.payment_type == 'Internal Transfer' %} {# ============================================================ #}
+            {{ itg_print_line (1, doc.paid_to, doc.base_received_amount_after_tax, 0) }} {# call Macro #}
+            {% if adebit.append(adebit[-1]  + doc.base_received_amount_after_tax)  %}{% endif %}
+            {% set ll = [1] %}   
+            {{ itg_taxes(doc) }}            {# call Macro #}
+            {{ itg_deduction(doc) }}        {# call Macro #}
+            {% if ll.append(ll[-1]  + 1 )  %}{% endif %}
+            {{ itg_print_line (ll[-1], doc.paid_from, 0, doc.paid_amount) }} {# call Macro #}
+            {% if acredit.append(acredit[-1]  + doc.paid_amount)  %}{% endif %}
+        {% endif %}
+            <tr class="table-total">
+                <td class="table-data"> </td>
+                <td class="table-data" style="text-align:right"><strong> {{ frappe.utils.total_thai_diff(adebit[-1], acredit[-1]) }} </strong></td>
+                <td class="table-data table-amount"><strong> {{frappe.utils.fmt_money(adebit[-1])}} </strong></td>
+                <td class="table-data table-amount"><strong> {{frappe.utils.fmt_money(acredit[-1])}} </strong></td>
             </tr>
-</div>
-{% endmacro %}
-
-{# ------------------- Main Program starts here ) -------------------- #}
-{# ------------------- Summary by account : line #1  : dr - derived from paid_to, paid_from ) -------------------- #}
-{# ------------------- Summary by account : line #2 onward arefrom taxes. deduction     -------------------- #}
-{# ------------------- Summary by account : last line: cr - derived from paid_to, paid_from ) -------------------- #}
-    
-<div class="margin-top">
-<table class='table table-bordered table-condensed'>
-    <caption><strong>Summary by account ( derived from paid_to, paid_from ) </strong></caption>
-    {% set adebit = [0] %}  
-    {% set acredit = [0] %}
-    <tr>
-        <th>No</th>
-        <th>Account</th>
-        <th>Debit Amount</th>
-        <th>Credit Amount</th>
-    </tr>
-{% if doc.payment_type == 'Receive' %}  {# ============================================================ #}
-    {{ itg_print_line (1, doc.paid_to, doc.base_received_amount, 0) }} {# call Macro #}
-    {% if adebit.append(adebit[-1]  + doc.base_received_amount)  %}{% endif %}
-    {% set ll = [1] %}   
-    {{ itg_taxes(doc) }}            {# call Macro #}
-    {{ itg_deduction(doc) }}        {# call Macro Deduction #}
-    {{ itg_unallocated_amount(doc) }}        {# call Macro #}
-    {% if ll.append(ll[-1]  + 1 )  %}{% endif %}
-    {{ itg_print_line (ll[-1], doc.paid_from, 0, doc.base_total_allocated_amount) }} {# call Macro #}
-    {% if acredit.append(acredit[-1]  + doc.base_total_allocated_amount )  %}{% endif %}
-{% endif %}
-    
-{% if doc.payment_type == 'Pay' %}             {# ============================================================ #}
-    {{ itg_print_line (1, doc.paid_to, doc.base_total_allocated_amount, 0) }}
-    {% if adebit.append(adebit[-1]  + doc.base_total_allocated_amount)  %}{% endif %}
-    {% set ll = [1] %}   
-    {{ itg_taxes(doc) }}            {# call Macro #}
-    {{ itg_deduction(doc) }}        {# call Macro #}
-    {{ itg_unallocated_amount(doc) }}        {# call Macro #}
-    {% if ll.append(ll[-1]  + 1 )  %}{% endif %}
-    {{ itg_print_line (ll[-1], doc.paid_from, 0, doc.base_paid_amount) }} {# call Macro #}
-    {% if acredit.append(acredit[-1]  + doc.base_paid_amount)  %}{% endif %}
-{% endif %}
-
-{% if doc.payment_type == 'Internal Transfer' %} {# ============================================================ #}
-    {{ itg_print_line (1, doc.paid_to, doc.base_received_amount_after_tax, 0) }} {# call Macro #}
-    {% if adebit.append(adebit[-1]  + doc.base_received_amount_after_tax)  %}{% endif %}
-    {% set ll = [1] %}   
-    {{ itg_taxes(doc) }}            {# call Macro #}
-    {{ itg_deduction(doc) }}        {# call Macro #}
-    {% if ll.append(ll[-1]  + 1 )  %}{% endif %}
-    {{ itg_print_line (ll[-1], doc.paid_from, 0, doc.paid_amount) }} {# call Macro #}
-    {% if acredit.append(acredit[-1]  + doc.paid_amount)  %}{% endif %}
-{% endif %}
-    <tr>
-        <td> </td>
-        <td style="text-align:right"><strong> {{ frappe.utils.total_thai_diff(adebit[-1], acredit[-1]) }} </strong></td>
-        <td style="text-align:right"><strong> {{frappe.utils.fmt_money(adebit[-1])}} </strong></td>
-        <td style="text-align:right"><strong> {{frappe.utils.fmt_money(acredit[-1])}} </strong></td>
-    </tr>
-</table>
-</div>
+        </table>
+        </div>

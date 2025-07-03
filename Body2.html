@@ -1,46 +1,103 @@
 <style>
+    /* Base Font Setting - ฟอนต์หลักสำหรับทั้งหมด */
     body, * {
-        font-family: 'TH Sarabun New', Sarabun, sans-serif !important;
+         font-family: 'TH Sarabun' !important;
         font-size: 14px;
     }
     
+    /* Table Base Style */
     table {
-        font-family: 'TH Sarabun New', Sarabun, sans-serif !important;
+        font-family: 'TH Sarabun' !important;
         font-size: 13px;
+        width: 100%;
+        margin-bottom: 20px;
     }
     
-    table td, table th {
-        font-family: 'TH Sarabun New', Sarabun, sans-serif !important;
+    /* Table Header Class - สำหรับหัวตาราง */
+    .cheque-header {
+       font-family: 'TH Sarabun' !important;
+        font-size: 12px !important;
+        font-weight: 600 !important;
+        background-color: #f8f9fa;
+        text-align: left !important;
+        padding: 8px;
     }
     
-    caption {
-        font-family: 'TH Sarabun New', Sarabun, sans-serif !important;
-        font-size: 14px;
-        font-weight: 600;
+    /* Table Data Class - สำหรับข้อมูลในตาราง */
+    .cheque-data {
+        font-family: 'TH Sarabun' !important;
+        font-size: 11px !important;
+        vertical-align: middle;
+        padding: 8px;
     }
     
+    /* Cheque Number Class - สำหรับคอลัมน์ Cheque No */
+    .cheque-number {
+     font-family: 'TH Sarabun' !important;
+        font-size: 11px !important;
+         text-align: left !important;
+        font-weight: 500;
+    }
+    
+    /* Cheque Date Class - สำหรับคอลัมน์ Cheque Date */
+    .cheque-date {
+       font-family: 'TH Sarabun' !important;
+        font-size: 11px !important;
+        text-align: left !important;
+    }
+    
+    /* Cheque Amount Class - สำหรับคอลัมน์ Amount */
+    .cheque-amount {
+       font-family: 'TH Sarabun' !important;
+        font-size: 11px !important;
+       text-align: right !important;
+        padding-right: 15px;
+        font-weight: 500;
+    }
+    
+    /* Caption Class - สำหรับหัวเรื่องตาราง */
+    .cheque-caption {
+       font-family: 'TH Sarabun' !important;
+        font-size: 14px !important;
+        font-weight: 600 !important;
+        text-align: left !important;
+        margin-bottom: 1px;
+    }
+     .cheque-caption strong {
+          font-size: 10pt !important;
+        }
+    
+    /* Strong text */
     strong {
-        font-family: 'TH Sarabun New', Sarabun, sans-serif !important;
-        font-weight: 600;
+       font-family: 'TH Sarabun' !important;
+        font-weight: 600 !important;
+    }
+    
+    /* Table Border (ถ้าต้องการ) */
+    .bordered-table {
+        border-collapse: collapse;
+    }
+    
+    .bordered-table th, .bordered-table td {
+        border: 1px solid #ddd;
     }
 </style>
 
-    {# ------------------- table Cheque : Cheque information -------------------- #}
-    {% if doc.reference_no != '-' and doc.reference_no != '' %} 
-    	<div class="margin-top">
+{# ------------------- table Cheque : Cheque information -------------------- #}
+{% if doc.reference_no != '-' and doc.reference_no != '' %} 
+    <div class="margin-top">
         <table class='table table-bordered table-condensed'>
-            <caption><strong>Cheque information</strong></caption>
+            <caption class="cheque-caption"><strong>Cheque information</strong></caption>
             <tr>
-                <th>Cheque No</th>
-                <th>Cheque Date</th>
-                <th>Amount</th>
+                <th class="cheque-header">Cheque No</th>
+                <th class="cheque-header">Cheque Date</th>
+                <th class="cheque-header">Amount</th>
             </tr>
-
             <tr>
-                <td>{{ doc.reference_no }}</td>
-                <td>{{ frappe.utils.format_date(doc.reference_date) }} </td>
-                <td style="text-align:right">{{frappe.utils.fmt_money(doc.received_amount)}}</td>
+                <td class="cheque-data cheque-number">{{ doc.reference_no }}</td>
+                <td class="cheque-data cheque-date">{{ frappe.utils.format_date(doc.reference_date) }}</td>
+                <td class="cheque-data cheque-amount">{{frappe.utils.fmt_money(doc.received_amount)}}</td>
             </tr>
         </table>
     </div>
-    {% endif %}
+{% endif %}
